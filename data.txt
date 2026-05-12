@@ -1,0 +1,26 @@
+Universitas	Provinsi	Kota	Program Studi	Bidang Ilmu	Jenjang	Daya Tampung 2026	Peminat 2025	Peminat 2025 (Num)	Rasio	Situs
+UNIVERSITAS SYIAH KUALA	Aceh	Kota Banda Aceh	PENDIDIKAN DOKTER HEWAN	KEDOKTERAN HEWAN	Sarjana	84	488	488	1:6	https://pmb.usk.ac.id/
+UNIVERSITAS SYIAH KUALA	Aceh	Kota Banda Aceh	TEKNIK SIPIL	TEKNIK SIPIL	Sarjana	98	736	736	1:8	https://pmb.usk.ac.id/
+UNIVERSITAS INDONESIA	Jawa Barat	Kota Depok	PENDIDIKAN DOKTER	KEDOKTERAN	Sarjana	75	3200	3200	1:43	https://simak.ui.ac.id/
+UNIVERSITAS INDONESIA	Jawa Barat	Kota Depok	ILMU KOMPUTER	TEKNOLOGI INFORMASI	Sarjana	60	2100	2100	1:35	https://simak.ui.ac.id/
+INSTITUT TEKNOLOGI BANDUNG	Jawa Barat	Kota Bandung	STEI - KOMPUTASI	TEKNOLOGI INFORMASI	Sarjana	120	1500	1500	1:12	https://admission.itb.ac.id/
+UNIVERSITAS GAJAH MADA	DI Yogyakarta	Kab. Sleman	HUKUM	HUKUM	Sarjana	105	2800	2800	1:27	https://um.ugm.ac.id/
+UNIVERSITAS AIRLANGGA	Jawa Timur	Kota Surabaya	KEDOKTERAN	KEDOKTERAN	Sarjana	70	2900	2900	1:41	https://ppmb.unair.ac.id/
+UNIVERSITAS BRAWIJAYA	Jawa Timur	Kota Malang	ILMU HUKUM	HUKUM	Sarjana	150	3500	3500	1:23	https://selma.ub.ac.id/
+UNIVERSITAS DIPONEGORO	Jawa Tengah	Kota Semarang	AKUNTANSI	EKONOMI	Sarjana	90	1800	1800	1:20	https://pmb.undip.ac.id/
+UNIVERSITAS PADJADJARAN	Jawa Barat	Kab. Sumedang	ILMU KOMUNIKASI	SOSIAL	Sarjana	80	2500	2500	1:31	https://smup.unpad.ac.id/
+UNIVERSITAS SEBELAS MARET	Jawa Tengah	Kota Surakarta	TEKNIK MESIN	TEKNIK	Sarjana	60	1200	1200	1:20	https://spmb.uns.ac.id/
+UNIVERSITAS HASANUDDIN	Sulawesi Selatan	Kota Makassar	TEKNIK PERKAPALAN	TEKNIK	Sarjana	50	450	450	1:9	https://regpmb.unhas.ac.id/
+UNIVERSITAS MULAWARMAN	Kalimantan Timur	Kota Samarinda	AGRIBISNIS	PERTANIAN	Sarjana	40	380	380	1:9	https://um.unmul.ac.id/
+UNIVERSITAS CENDERAWASIH	Papua	Kota Jayapura	TEKNIK SIPIL	TEKNIK	Sarjana	45	310	310	1:7	https://pmb.uncen.ac.id/
+UNIVERSITAS NEGERI JAKARTA	DKI Jakarta	Kota Jakarta Timur	PENDIDIKAN GURU SD	PENDIDIKAN	Sarjana	100	2200	2200	1:22	https://penmaba.unj.ac.id/
+UNIVERSITAS INDONESIA	Jawa Barat	Kota Depok	PRODI BARU ARTIFICIAL INTELLIGENCE	TEKNOLOGI INFORMASI	Sarjana	40			-	https://simak.ui.ac.id/
+UNIVERSITAS BRAWIJAYA	Jawa Timur	Kota Malang	BISNIS DIGITAL	EKONOMI	Sarjana	50	120	120	1:2	https://selma.ub.ac.id/
+UNIVERSITAS AIRLANGGA	Jawa Timur	Kota Surabaya	DATA SCIENCE baru	TEKNOLOGI INFORMASI	Sarjana	30			-	https://ppmb.unair.ac.id/
+UNIVERSITAS GADJAH MADA	DI Yogyakarta	Kab. Sleman	TEKNOLOGI PANGAN	PERTANIAN	Sarjana	55	800	800	1:14	https://um.ugm.ac.id/
+UNIVERSITAS INDONESIA	Jawa Barat	Kota Depok	SASTRA JEPANG	HUMANIORA	Sarjana	45	1100	1100	1:24	https://simak.ui.ac.id/
+UNIVERSITAS SYIAH KUALA	Aceh	Kota Banda Aceh	AGROTEKNOLOGI	PERTANIAN	Sarjana	60	250	250	1:4	https://pmb.usk.ac.id/
+UNIVERSITAS SYIAH KUALA	Aceh	Kota Banda Aceh	TEKNIK ELEKTRO	TEKNIK	Sarjana	50	180	180	1:3	https://pmb.usk.ac.id/
+UNIVERSITAS HASANUDDIN	Sulawesi Selatan	Kota Makassar	KEHUTANAN	KEHUTANAN	Sarjana	120	500	500	1:4	https://regpmb.unhas.ac.id/
+UNIVERSITAS HASANUDDIN	Sulawesi Selatan	Kota Makassar	ANTROPOLOGI SOSIAL	SOSIAL	Sarjana	40	90	90	1:2	https://regpmb.unhas.ac.id/
+UNIVERSITAS INDONESIA	Jawa Barat	Kota Depok	AKUNTANSI	EKONOMI	Sarjana	100	2800	2800	1:28	https://simak.ui.ac.id/

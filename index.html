@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jelajahi Daya Tampung & Peminat SNBT-UTBK 2026</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kompasBlue: '#00599A',
+                        kompasRed: '#c92b2c',
+                        kompasGold: '#F3C727',
+                    },
+                    fontFamily: {
+                        sans: ['PT Sans', 'sans-serif'],
+                        serif: ['Lora', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- D3.js for TSV Parsing -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        :root {
+            --kompas-blue: #00599A;
+            --kompas-red: #c92b2c;
+            --kompas-gold: #F3C727;
+        }
+        .keyword-brand {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--kompas-red);
+            font-size: 12px;
+            letter-spacing: 0.1em;
+        }
+        body {
+            font-family: 'Lora', serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+        }
+        .data-text {
+            font-family: 'PT Sans', sans-serif;
+        }
+        .data-text-bold {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+        }
+        /* Bento Grid Styles */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 16px;
+            padding: 24px;
+            background: #f9f9f9;
+            border-radius: 12px;
+        }
+        @media (min-width: 768px) {
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 1024px) {
+            .bento-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        .filter-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .filter-label {
+            font-family: 'PT Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #888;
+        }
+        .filter-select {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px;
+            font-family: 'PT Sans', sans-serif;
+            font-size: 13px;
+            width: 100%;
+        }
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 16px 24px;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            background: #fff;
+            align-items: center;
+            justify-content: center;
+        }
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+        .stat-value {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--kompas-blue);
+        }
+        .stat-label {
+            font-family: 'PT Sans', sans-serif;
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .stat-divider {
+            width: 1px;
+            height: 32px;
+            background: #eee;
+        }
+        @media (max-width: 640px) {
+            .stat-divider { display: none; }
+            .stat-item { min-width: 40%; }
+        }
+        /* Table styles */
+        .data-table thead {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 10;
+        }
+        .data-table th {
+            border-bottom: 2px solid #333;
+            font-family: 'PT Sans', sans-serif;
+            font-size: 12px;
+            padding: 12px 16px;
+        }
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+        }
+        /* Ratio Badges */
+        .ratio-badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+            min-width: 70px;
+            text-align: center;
+            font-family: 'PT Sans', sans-serif;
+        }
+        .ratio-high { background: #eef2ff; color: var(--kompas-blue); }
+        .ratio-mid { background: #fef9c3; color: #854d0e; }
+        .ratio-low { background: #f0fdf4; color: #166534; }
+        .ratio-new { background: #f3f4f6; color: #6b7280; font-style: italic; }
+
+        /* Pagination button active state */
+        .page-btn.active {
+            background-color: var(--kompas-blue);
+            color: white;
+            border-color: var(--kompas-blue);
+        }
+        .page-btn {
+            padding: 4px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #fff;
+            font-family: 'PT Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <div id="app" class="max-w-6xl mx-auto px-4 py-8 bg-white shadow-sm min-h-screen">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="keyword-brand mb-2 text-sm">Data Interaktif</div>
+            <h1 class="text-3xl md:text-4xl font-bold font-serif mb-4 leading-tight">
+                Jelajahi Daya Tampung & Peminat <span class="text-kompasBlue">SNBT-UTBK 2026</span>
+            </h1>
+            <p class="text-gray-600 font-serif leading-relaxed">
+                Temukan informasi lengkap mengenai daya tampung program studi PTN tahun 2026, jumlah peminat tahun sebelumnya, dan tingkat keketatan persaingan untuk membantu rencana studi Anda.
+            </p>
+        </header>
+
+        <section id="filters" class="bento-grid mb-8">
+            <div class="filter-card">
+                <label class="filter-label">Provinsi</label>
+                <select id="filter-provinsi" class="filter-select">
+                    <option value="">Semua Provinsi</option>
+                </select>
+            </div>
+            <div class="filter-card">
+                <label class="filter-label">Universitas</label>
+                <select id="filter-universitas" class="filter-select">
+                    <option value="">Semua Universitas</option>
+                </select>
+            </div>
+            <div class="filter-card">
+                <label class="filter-label">Bidang Ilmu & Jenjang</label>
+                <div class="flex gap-2">
+                    <select id="filter-bidang" class="filter-select">
+                        <option value="">Bidang</option>
+                    </select>
+                    <select id="filter-jenjang" class="filter-select">
+                        <option value="">Jenjang</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-card">
+                <label class="filter-label">Cari Program Studi</label>
+                <div class="flex gap-2">
+                    <input type="text" id="search-prodi" placeholder="Ketik nama prodi..." class="filter-select flex-1">
+                    <button id="btn-reset" class="bg-kompasRed text-white font-bold px-3 py-1 rounded text-xs uppercase tracking-wider data-text hover:opacity-90">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary Bar -->
+        <section id="summary" class="stats-container mb-6 rounded-lg shadow-sm border border-gray-100">
+            <div class="stat-item">
+                <span id="stat-prodi" class="stat-value">0</span>
+                <span class="stat-label">Total Prodi</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span id="stat-ptn" class="stat-value">0</span>
+                <span class="stat-label">PTN</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span id="stat-tampung" class="stat-value">0</span>
+                <span class="stat-label">Daya Tampung</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span id="stat-peminat" class="stat-value">0</span>
+                <span class="stat-label">Peminat 2025</span>
+            </div>
+        </section>
+
+        <!-- Table Section -->
+        <div class="table-container overflow-x-auto border rounded-lg">
+            <table class="w-full text-left text-sm border-collapse data-table">
+                <thead class="bg-white">
+                    <tr class="data-text uppercase text-[11px] font-bold tracking-wider text-gray-800">
+                        <th class="cursor-pointer hover:bg-gray-50 transition-colors" data-sort="Universitas" style="width: 25%">PTN <span></span></th>
+                        <th class="cursor-pointer hover:bg-gray-50 transition-colors" data-sort="Program Studi" style="width: 25%">Program Studi <span></span></th>
+                        <th class="cursor-pointer hover:bg-gray-50 transition-colors hidden md:table-cell" data-sort="Bidang Ilmu" style="width: 15%">Bidang <span></span></th>
+                        <th class="cursor-pointer hover:bg-gray-50 transition-colors" data-sort="Jenjang" style="width: 10%">Jenjang <span></span></th>
+                        <th class="cursor-pointer hover:bg-gray-50 transition-colors text-right" data-sort="Daya Tampung 2026">Daya Tampung <span></span></th>
+                        <th class="cursor-pointer hover:bg-gray-50 transition-colors text-right" data-sort="Peminat 2025 (Num)">Peminat <span></span></th>
+                        <th class="cursor-pointer hover:bg-gray-50 transition-colors text-center" data-sort="RasioNum">Rasio <span></span></th>
+                    </tr>
+                </thead>
+                <tbody id="table-body" class="divide-y font-serif">
+                    <!-- Rows will be injected here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex flex-col md:flex-row items-center justify-between mt-6 gap-4">
+            <div id="pagination-info" class="text-sm text-gray-500 font-serif italic">
+                Menampilkan 0–0 dari 0 data
+            </div>
+            <div id="pagination-controls" class="flex items-center gap-2">
+                <!-- Pagination buttons generated via JS -->
+            </div>
+        </div>
+
+        <!-- Footer / Credits -->
+        <footer class="mt-12 pt-8 border-t border-gray-100 text-sm text-gray-500 font-serif">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="font-bold mb-2 uppercase text-xs data-text text-gray-700">Catatan & Penjelasan</h3>
+                    <ul class="space-y-2 list-disc pl-4">
+                        <li><strong>Sumber Data:</strong> Seleksi Nasional Penerimaan Mahasiswa Baru (SNPMB) 2026.</li>
+                        <li><strong>Prodi Baru:</strong> Program studi yang baru dibuka atau belum memiliki data peminat pada tahun 2025.</li>
+                        <li><strong>Rasio Keketatan:</strong> Dihitung berdasarkan jumlah peminat tahun 2025 dibagi daya tampung tahun 2026. Semakin tinggi angka rasio (misal 1:40), semakin ketat persaingan.</li>
+                    </ul>
+                </div>
+                <div class="md:text-right">
+                    <p class="mb-2 italic">Diolah: Kompas/[GP]</p>
+                    <p>© 2026 Harian Kompas</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let allData = [];
+            let filteredData = [];
+            let currentPage = 1;
+            const rowsPerPage = 20;
+            let currentSort = { key: 'Universitas', asc: true };
+
+            const elements = {
+                tableBody: document.getElementById('table-body'),
+                filterProvinsi: document.getElementById('filter-provinsi'),
+                filterUniversitas: document.getElementById('filter-universitas'),
+                filterBidang: document.getElementById('filter-bidang'),
+                filterJenjang: document.getElementById('filter-jenjang'),
+                searchProdi: document.getElementById('search-prodi'),
+                btnReset: document.getElementById('btn-reset'),
+                statProdi: document.getElementById('stat-prodi'),
+                statPTN: document.getElementById('stat-ptn'),
+                statTampung: document.getElementById('stat-tampung'),
+                statPeminat: document.getElementById('stat-peminat'),
+                paginationInfo: document.getElementById('pagination-info'),
+                paginationControls: document.getElementById('pagination-controls')
+            };
+
+            // Initial fetch
+            d3.tsv('data.txt').then(data => {
+                allData = data.map(d => {
+                    const peminat = parseInt(d['Peminat 2025 (Num)']) || 0;
+                    const dayaTampung = parseInt(d['Daya Tampung 2026']) || 0;
+                    
+                    // Parse ratio numeric value for sorting
+                    let rasioNum = 0;
+                    if (d['Rasio'] && d['Rasio'].includes(':')) {
+                        rasioNum = parseInt(d['Rasio'].split(':')[1]);
+                    }
+
+                    return {
+                        ...d,
+                        peminatRaw: peminat,
+                        tampungRaw: dayaTampung,
+                        RasioNum: rasioNum
+                    };
+                });
+                
+                populateFilters();
+                applyFilters();
+                setupEventListeners();
+                
+                // Set initial sort indicator
+                updateSortIndicators();
+            }).catch(err => {
+                console.error("Gagal memuat data.txt:", err);
+                elements.tableBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500 font-serif">Gagal memuat data. Pastikan file data.txt tersedia di root.</td></tr>`;
+            });
+
+            function populateFilters() {
+                const getUnique = (key) => [...new Set(allData.map(d => d[key]))].sort();
+                
+                const provs = getUnique('Provinsi');
+                const unis = getUnique('Universitas');
+                const bidangs = getUnique('Bidang Ilmu');
+                const jenjangs = getUnique('Jenjang');
+
+                fillSelect(elements.filterProvinsi, provs);
+                fillSelect(elements.filterUniversitas, unis);
+                fillSelect(elements.filterBidang, bidangs);
+                fillSelect(elements.filterJenjang, jenjangs);
+            }
+
+            function fillSelect(select, values) {
+                values.forEach(v => {
+                    if (!v) return;
+                    const opt = document.createElement('option');
+                    opt.value = v;
+                    opt.textContent = v;
+                    select.appendChild(opt);
+                });
+            }
+
+            function setupEventListeners() {
+                // Filter changes
+                [elements.filterProvinsi, elements.filterUniversitas, elements.filterBidang, elements.filterJenjang].forEach(el => {
+                    el.addEventListener('change', () => {
+                        currentPage = 1;
+                        applyFilters();
+                    });
+                });
+
+                // Search input
+                elements.searchProdi.addEventListener('input', () => {
+                    currentPage = 1;
+                    applyFilters();
+                });
+
+                // Reset button
+                elements.btnReset.addEventListener('click', () => {
+                    elements.filterProvinsi.value = "";
+                    elements.filterUniversitas.value = "";
+                    elements.filterBidang.value = "";
+                    elements.filterJenjang.value = "";
+                    elements.searchProdi.value = "";
+                    currentPage = 1;
+                    applyFilters();
+                });
+
+                // Table heads for sorting
+                document.querySelectorAll('th[data-sort]').forEach(th => {
+                    th.addEventListener('click', () => {
+                        const key = th.getAttribute('data-sort');
+                        if (currentSort.key === key) {
+                            currentSort.asc = !currentSort.asc;
+                        } else {
+                            currentSort.key = key;
+                            currentSort.asc = true;
+                        }
+                        sortData();
+                        updateSortIndicators();
+                        renderTable();
+                    });
+                });
+            }
+
+            function applyFilters() {
+                const prov = elements.filterProvinsi.value;
+                const uni = elements.filterUniversitas.value;
+                const bidang = elements.filterBidang.value;
+                const jenjang = elements.filterJenjang.value;
+                const search = elements.searchProdi.value.toLowerCase();
+
+                filteredData = allData.filter(d => {
+                    return (prov === "" || d.Provinsi === prov) &&
+                           (uni === "" || d.Universitas === uni) &&
+                           (bidang === "" || d['Bidang Ilmu'] === bidang) &&
+                           (jenjang === "" || d.Jenjang === jenjang) &&
+                           (search === "" || d['Program Studi'].toLowerCase().includes(search));
+                });
+
+                sortData();
+                renderTable();
+                updateStats();
+            }
+
+            function sortData() {
+                filteredData.sort((a, b) => {
+                    let valA = a[currentSort.key];
+                    let valB = b[currentSort.key];
+
+                    // Numeric comparison for stats
+                    if (currentSort.key === 'Daya Tampung 2026' || currentSort.key === 'Peminat 2025 (Num)' || currentSort.key === 'RasioNum') {
+                        valA = parseFloat(valA) || 0;
+                        valB = parseFloat(valB) || 0;
+                    }
+
+                    if (valA < valB) return currentSort.asc ? -1 : 1;
+                    if (valA > valB) return currentSort.asc ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            function updateSortIndicators() {
+                document.querySelectorAll('th[data-sort] span').forEach(span => {
+                    const th = span.parentElement;
+                    const key = th.getAttribute('data-sort');
+                    if (key === currentSort.key) {
+                        span.textContent = currentSort.asc ? ' ↑' : ' ↓';
+                        th.classList.add('text-kompasBlue');
+                    } else {
+                        span.textContent = '';
+                        th.classList.remove('text-kompasBlue');
+                    }
+                });
+            }
+
+            function updateStats() {
+                elements.statProdi.textContent = filteredData.length.toLocaleString('id-ID');
+                
+                const ptnCount = new Set(filteredData.map(d => d.Universitas)).size;
+                elements.statPTN.textContent = ptnCount.toLocaleString('id-ID');
+
+                const totalTampung = filteredData.reduce((sum, d) => sum + (parseInt(d['Daya Tampung 2026']) || 0), 0);
+                elements.statTampung.textContent = totalTampung.toLocaleString('id-ID');
+
+                const totalPeminat = filteredData.reduce((sum, d) => sum + (parseInt(d['Peminat 2025 (Num)']) || 0), 0);
+                elements.statPeminat.textContent = totalPeminat.toLocaleString('id-ID');
+            }
+
+            function renderTable() {
+                const startIndex = (currentPage - 1) * rowsPerPage;
+                const slice = filteredData.slice(startIndex, startIndex + rowsPerPage);
+
+                elements.tableBody.innerHTML = '';
+
+                if (slice.length === 0) {
+                    elements.tableBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500 italic">Data tidak ditemukan dengan filter saat ini.</td></tr>`;
+                    updatePagination(0);
+                    return;
+                }
+
+                slice.forEach(d => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition-colors border-b last:border-0';
+                    
+                    const ratioLabel = getRatioLabel(d);
+
+                    row.innerHTML = `
+                        <td class="p-4 py-3">
+                            <span class="block font-bold text-kompasBlue text-xs data-text uppercase mb-1">${d.Provinsi}</span>
+                            <span class="font-bold">${d.Universitas}</span>
+                        </td>
+                        <td class="p-4 py-3 font-bold">${d['Program Studi']}</td>
+                        <td class="p-4 py-3 hidden md:table-cell text-gray-600">${d['Bidang Ilmu']}</td>
+                        <td class="p-4 py-3">
+                            <span class="px-2 py-1 bg-gray-100 rounded text-[10px] uppercase font-bold text-gray-600 data-text">${d.Jenjang}</span>
+                        </td>
+                        <td class="p-4 py-3 text-right data-text-bold text-lg">${parseInt(d['Daya Tampung 2026']).toLocaleString('id-ID')}</td>
+                        <td class="p-4 py-3 text-right data-text text-gray-500">${(parseInt(d['Peminat 2025 (Num)']) || 0).toLocaleString('id-ID')}</td>
+                        <td class="p-4 py-3 text-center">${ratioLabel}</td>
+                    `;
+                    elements.tableBody.appendChild(row);
+                });
+
+                updatePagination(slice.length);
+            }
+
+            function getRatioLabel(d) {
+                const peminat = d['Peminat 2025 (Num)'];
+                if (!peminat || peminat === "" || peminat === "0") {
+                    return `<span class="ratio-badge ratio-new">Prodi baru</span>`;
+                }
+
+                const ratio = d.RasioNum;
+                // Rasio tinggi (10 ke atas): biru - "ketat"
+                // Rasio sedang (3 - 10): kuning
+                // Rasio rendah (di bawah 3): hijau
+
+                if (ratio >= 10) {
+                    return `<span class="ratio-badge ratio-high">1:${ratio} Ketat</span>`;
+                } else if (ratio >= 3) {
+                    return `<span class="ratio-badge ratio-mid">1:${ratio}</span>`;
+                } else {
+                    return `<span class="ratio-badge ratio-low">1:${ratio}</span>`;
+                }
+            }
+
+            function updatePagination(currentSliceCount) {
+                const total = filteredData.length;
+                const totalPages = Math.ceil(total / rowsPerPage);
+                
+                if (total === 0) {
+                    elements.paginationInfo.textContent = `Menampilkan 0–0 dari 0 data`;
+                    elements.paginationControls.innerHTML = '';
+                    return;
+                }
+
+                const start = (currentPage - 1) * rowsPerPage + 1;
+                const end = Math.min(start + currentSliceCount - 1, total);
+                elements.paginationInfo.textContent = `Menampilkan ${start}–${end} dari ${total.toLocaleString('id-ID')} data`;
+
+                elements.paginationControls.innerHTML = '';
+                
+                // Prev button
+                const prev = createPageBtn('←', () => { if(currentPage > 1) { currentPage--; renderTable(); } });
+                if(currentPage === 1) prev.classList.add('opacity-30', 'pointer-events-none');
+                elements.paginationControls.appendChild(prev);
+
+                // Page numbers (limited)
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + 4);
+                if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const btn = createPageBtn(i, () => { currentPage = i; renderTable(); });
+                    if (i === currentPage) btn.classList.add('active');
+                    elements.paginationControls.appendChild(btn);
+                }
+
+                // Next button
+                const next = createPageBtn('→', () => { if(currentPage < totalPages) { currentPage++; renderTable(); } });
+                if(currentPage === totalPages) next.classList.add('opacity-30', 'pointer-events-none');
+                elements.paginationControls.appendChild(next);
+            }
+
+            function createPageBtn(text, onClick) {
+                const btn = document.createElement('button');
+                btn.className = 'page-btn px-3 py-1 border rounded hover:bg-gray-50 transition-colors data-text text-sm font-bold min-w-[32px]';
+                btn.textContent = text;
+                btn.onclick = onClick;
+                return btn;
+            }
+        });
+    </script>
+</body>
+</html>
